@@ -1,0 +1,41 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf390
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red254\green253\blue213;}
+\margl1440\margr1440\vieww14080\viewh17760\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 The tree flow existence proof produces a 'minimum voltage' solution and assumes only the root produces power. OPF doesn't prescribe voltage magnitudes at buses, but does give bounds. PF prescribes voltage magnitudes and power consumption/injection at all non-slack buses. Ignoring reactive power, PF is really only looking for voltage angles and the slack power.\
+\
+We were looking for a flow that minimizes the deviation from fixed voltage magnitudes. I'm not sure how that fits in with the above, and in particular which variables should be considered known and unknown.\
+\
+\cb2 the next thing to do is to implement the dynamic programming procedure we discussed to find a tree-solution that is as close as possible to a given operating point: voltage magnitudes, in particular, but also output ranges for the generators.  OPF prescribes bounds (ranges) but these could be (and often are) quite tight.  If you have e.g. for a given generator the range [V^min , V^max] then in the objective you penalize the square of the excess of the voltage magnitude above V^max, or below V^min.  A simpler task to get started with would be to simply penalize the square deviation off the mid-point between V^min and V^max. \cb1 \
+\
+Okay that makes sense. We discussed enumerating a large number of voltage angles and magnitudes at each bus, but what about power outputs? Or are we still assuming that only the root produces power?\
+\
+\cb2 If I recall, we also need to enumerate power outputs at the root of each subtree we look at.  So we will enumerate about one million to one billion possible cases at each vertex.  This is probably overkill, but with a proper implementation it should run in a few seconds on a thousand bus tree.\cb1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 -----------------------------------------------------------------------------------------------------------------------------------------------------------------\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+\
+\cb2 We had discussed before how a solution to the power flow equations always exists, on a tree, under certain assumptions and by disregarding some of the constraints.  The next step was to derive a dynamic-programming procedure for minimizing the L2-norm of the error (in terms of the addressing the violated constraints) again on a tree.  This procedure has to be made precise, and at that point we can implement it and test it on cases of different size.  It should work well on trees with a few thousand nodes.\
+\
+After that comes the attack problem, which would build on the DP algorithm (one extra layer).  This is the attack problem on trees.  Then we can combine this with the search procedure that computes a spanning tree (given a solution) that maximizes eg. the sum of absolute values of real flows on the edges; then attacks that tree, then recomputes the power flow on the resulting network, computes a new spanning tree, and an attack to it; takes a convex combination of the previous attack and the new one (half / half, say), and so on.\cb1 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 -----------------------------------------------------------------------------------------------------------------------------------------------------------------\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+\
+I'm still not 100% on how exactly this works. Does the procedure begin at the root, enumerating over the range of power outputs and voltage magnitudes, and propagating this down the tree? Or does it somehow begin at the leaves, enumerating the complex voltage and pushing this up to the root? I've looked at both, and in either case there are some details I'm unclear on. Starting at the root is what the Baran and Wu paper discusses, though I remember we ruled that out for some reason.\
+\
+\cb2 You start at the leaves and move up.  If you look at what I wrote, the computation requires that you know (recursively) what has happened at the children of the node you are enumerating.\cb1 \
+\
+Yes, okay. In this case, what is the range of power injections at the node you are considering? We know this at the root, but probably not at the intermediate nodes?\
+\
+\cb2 That's something to work out, you need to think about what should work.  Maybe do some simple experiments first.  But you should anticipate that losses would be on the small side, so the injections "should" be on the order of the total demand in the subtree.\cb1 \
+\
+Yes, I was thinking along those lines. What's the most power that might be lost between adjacent buses, maybe 10%? I could look at the matpower cases and see what happens there. Also look at the analytic expression for real power loss, see if anything falls out of that.\
+\
+\cb2 Something like that. But you could also use the powers of two approximation approach I had outlined so that your error is always within some defined margin of the total power.}
