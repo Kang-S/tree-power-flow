@@ -1,0 +1,39 @@
+Sounds good. For voltages you can probably restrict the range to [ .8 , 1.2 ] .
+That's already larger than what people would allow in practice. Also I don't
+know what the spanning trees will look like, i.e. if they will be bushy or
+path-like. If bushy then one could do a parallel implementation, though that
+might only save half the time, at some cost in the complexity of the code. You
+could also parallelize each individual enumerative step (i.e. the processing of
+a single node of the tree). A final thought is that you could approximate the
+exact power flow equation that you actually solve with something simpler if it
+is easier to analyze. Finally, computing square roots (if done often) can be
+slow and if the range of the arguments of the square roots is known in advance
+you can pre-compute square roots over a discretized subset, and store these
+values -- this would cost an array lookup plus one arithmetic operation and in
+my experience this could actually save a meaningful amount of time.
+
+
+
+This kind of discretization is basically what I had in mind. You could further
+improve it by discretizing based on a scale parameter.  That is to say, instead
+of rounding on tenths (or hundredths) you could take a scale value s (for
+example, s = 1.01, or s = 1.001) and then enumerate by rounding to multiples of
+powers of s.  Let's say you are enumerating voltage values.  Split this into
+voltages larger than 1, and smaller than 1. In the larger than 1 case, you
+would enumerate the following values: 1, s, s^2, s^3, etc. An advantage of this
+is that whatever value is the real value, what you enumerate is within a factor
+of s away from it. A similar approach would be used to enumerate values less
+than 1.
+
+Is this better or worse than the basic rounding you recommended? In general
+this will produce a smaller number of cases to enumerate. On the other hand the
+method you used could be more accurate (provided you round to a fine enough
+grid). In actual testing one or the other could be better (with different
+tradeoffs of speed vs accuracy).
+
+On another matter, I suggest that you go back and revisit the equations you had
+on the power flow solution you compute.  Back when I was reading this it seems
+that there a number of cases where the argument was not clear (e.g. about the
+sign of the discriminant in some of the quadratic equations). It's a good time
+to check on that now, since you are relying on this quite a bit and now will
+start testing this on a larger scale.
