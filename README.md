@@ -1,6 +1,8 @@
 tree-power-flow
 ===============
 
+http://nbviewer.ipython.org/github/sharnett/tree-power-flow/tree/master/
+
 For anyone actually looking at this, use http://nbviewer.ipython.org/ to view the .ipynb files. The ones worth looking at are:
 
 * [write up](http://nbviewer.ipython.org/github/sharnett/tree-power-flow/blob/master/precise%20write%20up.ipynb)
