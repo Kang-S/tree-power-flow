@@ -1,18 +1,4 @@
-function mpc = case14
-%CASE14    Power flow data for IEEE 14 bus test case.
-%   Please see CASEFORMAT for details on the case file format.
-%   This data was converted from IEEE Common Data Format
-%   (ieee14cdf.txt) on 20-Sep-2004 by cdf2matp, rev. 1.11
-%   See end of file for warnings generated during conversion.
-%
-%   Converted from IEEE CDF file from:
-%       http://www.ee.washington.edu/research/pstca/
-% 
-%  08/19/93 UW ARCHIVE           100.0  1962 W IEEE 14 Bus Test Case
-
-%   MATPOWER
-%   $Id: case14.m,v 1.11 2010/03/10 18:08:15 ray Exp $
-
+function mpc = case14_tree
 %% MATPOWER Case Format : Version 2
 mpc.version = '2';
 
@@ -32,8 +18,8 @@ mpc.bus = [
 	7	1	0	0	0	0	1	1.062	-13.37	0	1	1.06	0.94;
 	8	2	0	0	0	0	1	1.09	-13.36	0	1	1.06	0.94;
 	9	1	29.5	16.6	0	19	1	1.056	-14.94	0	1	1.06	0.94;
-	10	1	9	5.8	0	0	1	1.051	-15.1	0	1	1.06	0.94;
-	11	1	3.5	1.8	0	0	1	1.057	-14.79	0	1	1.06	0.94;
+	10	1	3.5	1.8	0	0	1	1.057	-14.79	0	1	1.06	0.94;
+	11	1	9	5.8	0	0	1	1.051	-15.1	0	1	1.06	0.94;
 	12	1	6.1	1.6	0	0	1	1.055	-15.07	0	1	1.06	0.94;
 	13	1	13.5	5.8	0	0	1	1.05	-15.16	0	1	1.06	0.94;
 	14	1	14.9	5	0	0	1	1.036	-16.04	0	1	1.06	0.94;
@@ -59,7 +45,7 @@ mpc.branch = [
 	4	7	0	0.20912	0	9900	0	0	0.978	0	1	-360	360;
 	4	9	0	0.55618	0	9900	0	0	0.969	0	1	-360	360;
 	5	6	0	0.25202	0	9900	0	0	0.932	0	1	-360	360;
-	6	11	0.09498	0.1989	0	9900	0	0	0	0	1	-360	360;
+	6	10	0.09498	0.1989	0	9900	0	0	0	0	1	-360	360;
 	6	12	0.12291	0.25581	0	9900	0	0	0	0	1	-360	360;
 	6	13	0.06615	0.13027	0	9900	0	0	0	0	1	-360	360;
 	7	8	0	0.17615	0	9900	0	0	0	0	1	-360	360;
