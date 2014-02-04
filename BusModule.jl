@@ -13,7 +13,7 @@ function print(io::IO, b::Bus)
     print(io, "bus$name")
 end;
 import Base.show
-show(io::IO, b::Bus) = print(io, b, " show")
+show(io::IO, b::Bus) = print(io, b)
 export Bus, print, show
 
 end # module BusModule

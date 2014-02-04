@@ -1,3 +1,5 @@
+using BusModule
+
 function parse_matpower(casefile)
     # assumes the buses are numbered in order from 1 to n and 1 is the root
     # can relax later if needed
@@ -54,4 +56,4 @@ end
 function loadcase(casefile)
     d,a,c = parse_matpower(casefile)
     assemble_buses(d,a,c)
-end
+end;

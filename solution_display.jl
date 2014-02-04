@@ -36,9 +36,11 @@ function dump(bus) # to csv, for python comparison
     writecsv("julia.csv", A)
 end
 
-function print_full_solution(candidate, root)
+function print_full_solution(candidate, root, R2)
     # breadth first search the tree, finding the correct (p,v) at each child
     # from the candidate of the parent
+    _round(x, p) = round(x/p)*p
+    key(p::Float64, v::Float64) = _round(p, R2), v
     @printf "%6s %7.3f %7.3f\n" root candidate.p candidate.v
     q = [(candidate,root)];
     while length(q) > 0

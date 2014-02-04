@@ -28,6 +28,6 @@ function add(cand::Candidate, i, child)
     result
 end
 
-export Candidate
+export Candidate, add, add!, isless
 
 end # CandidateModule
