@@ -1,22 +1,23 @@
-function mpc = case14_tree
+function mpc = test
+
 %% MATPOWER Case Format : Version 2
 mpc.version = '2';
 
 %%-----  Power Flow Data  -----%%
 %% system MVA base
-mpc.baseMVA = 100;
+mpc.baseMVA = 1;
 
 %% bus data
 %	bus_i	type	Pd	Qd	Gs	Bs	area	Vm	Va	baseKV	zone	Vmax	Vmin
 mpc.bus = [
 	1	3	0	0	0	0	1	1.06	0	0	1	1.06	0.94;
-	2	2	21.7	12.7	0	0	1	1.045	-4.98	0	1	1.06	0.94;
-	3	2	94.2	19	0	0	1	1.01	-12.72	0	1	1.06	0.94;
+	2	1	21.7	12.7	0	0	1	1.045	-4.98	0	1	1.06	0.94;
+	3	1	94.2	19	0	0	1	1.01	-12.72	0	1	1.06	0.94;
 	4	1	47.8	-3.9	0	0	1	1.019	-10.33	0	1	1.06	0.94;
 	5	1	7.6	1.6	0	0	1	1.02	-8.78	0	1	1.06	0.94;
-	6	2	11.2	7.5	0	0	1	1.07	-14.22	0	1	1.06	0.94;
+	6	1	11.2	7.5	0	0	1	1.07	-14.22	0	1	1.06	0.94;
 	7	1	0	0	0	0	1	1.062	-13.37	0	1	1.06	0.94;
-	8	2	0	0	0	0	1	1.09	-13.36	0	1	1.06	0.94;
+	8	1	0	0	0	0	1	1.09	-13.36	0	1	1.06	0.94;
 	9	1	29.5	16.6	0	19	1	1.056	-14.94	0	1	1.06	0.94;
 	10	1	3.5	1.8	0	0	1	1.057	-14.79	0	1	1.06	0.94;
 	11	1	9	5.8	0	0	1	1.051	-15.1	0	1	1.06	0.94;
@@ -29,7 +30,7 @@ mpc.bus = [
 %	bus	Pg	Qg	Qmax	Qmin	Vg	mBase	status	Pmax	Pmin	Pc1	Pc2	Qc1min	Qc1max	Qc2min	Qc2max	ramp_agc	ramp_10	ramp_30	ramp_q	apf
 mpc.gen = [
 	1	232.4	-16.9	10	0	1.06	100	1	332.4	0	0	0	0	0	0	0	0	0	0	0	0;
-	2	40	42.4	50	-40	1.045	100	1	140	0	0	0	0	0	0	0	0	0	0	0	0;
+	2	0	42.4	50	-40	1.045	100	1	140	0	0	0	0	0	0	0	0	0	0	0	0;
 	3	0	23.4	40	0	1.01	100	1	100	0	0	0	0	0	0	0	0	0	0	0	0;
 	6	0	12.2	24	-6	1.07	100	1	100	0	0	0	0	0	0	0	0	0	0	0	0;
 	8	0	17.4	24	-6	1.09	100	1	100	0	0	0	0	0	0	0	0	0	0	0	0;
@@ -38,19 +39,19 @@ mpc.gen = [
 %% branch data
 %	fbus	tbus	r	x	b	rateA	rateB	rateC	ratio	angle	status	angmin	angmax
 mpc.branch = [
-	1	2	0.01938	0.05917	0.0528	9900	0	0	0	0	1	-360	360;
-	1	5	0.05403	0.22304	0.0492	9900	0	0	0	0	1	-360	360;
-	2	3	0.04699	0.19797	0.0438	9900	0	0	0	0	1	-360	360;
-	2	4	0.05811	0.17632	0.034	9900	0	0	0	0	1	-360	360;
-	4	7	0	0.20912	0	9900	0	0	0.978	0	1	-360	360;
-	4	9	0	0.55618	0	9900	0	0	0.969	0	1	-360	360;
-	5	6	0	0.25202	0	9900	0	0	0.932	0	1	-360	360;
-	6	10	0.09498	0.1989	0	9900	0	0	0	0	1	-360	360;
-	6	12	0.12291	0.25581	0	9900	0	0	0	0	1	-360	360;
-	6	13	0.06615	0.13027	0	9900	0	0	0	0	1	-360	360;
-	7	8	0	0.17615	0	9900	0	0	0	0	1	-360	360;
-	9	14	0.12711	0.27038	0	9900	0	0	0	0	1	-360	360;
-	10	11	0.08205	0.19207	0	9900	0	0	0	0	1	-360	360;
+	1	2	0.0001938	0.0005917	0.0528	9900	0	0	0	0	1	-360	360;
+	1	5	0.0005403	0.0022304	0.0492	9900	0	0	0	0	1	-360	360;
+	2	3	0.0004699	0.0019797	0.0438	9900	0	0	0	0	1	-360	360;
+	2	4	0.0005811	0.0017632	0.034	9900	0	0	0	0	1	-360	360;
+	4	7	0	0.0020912	0	9900	0	0	0.978	0	1	-360	360;
+	4	9	0	0.0055618	0	9900	0	0	0.969	0	1	-360	360;
+	5	6	0	0.0025202	0	9900	0	0	0.932	0	1	-360	360;
+	6	10	0.0009498	0.001989	0	9900	0	0	0	0	1	-360	360;
+	6	12	0.0012291	0.0025581	0	9900	0	0	0	0	1	-360	360;
+	6	13	0.0006615	0.0013027	0	9900	0	0	0	0	1	-360	360;
+	7	8	0	0.0017615	0	9900	0	0	0	0	1	-360	360;
+	9	14	0.0012711	0.0027038	0	9900	0	0	0	0	1	-360	360;
+	10	11	0.0008205	0.0019207	0	9900	0	0	0	0	1	-360	360;
 ];
 
 %%-----  OPF Data  -----%%
@@ -64,28 +65,3 @@ mpc.gencost = [
 	2	0	0	3	0.01	40	0;
 	2	0	0	3	0.01	40	0;
 ];
-
-% Warnings from cdf2matp conversion:
-%
-% ***** Qmax = Qmin at generator at bus    1 (Qmax set to Qmin + 10)
-% ***** area data conversion not yet implemented (creating dummy area data)
-% ***** MVA limit of branch 1 - 2 not given, set to 9900
-% ***** MVA limit of branch 1 - 5 not given, set to 9900
-% ***** MVA limit of branch 2 - 3 not given, set to 9900
-% ***** MVA limit of branch 2 - 4 not given, set to 9900
-% ***** MVA limit of branch 2 - 5 not given, set to 9900
-% ***** MVA limit of branch 3 - 4 not given, set to 9900
-% ***** MVA limit of branch 4 - 5 not given, set to 9900
-% ***** MVA limit of branch 4 - 7 not given, set to 9900
-% ***** MVA limit of branch 4 - 9 not given, set to 9900
-% ***** MVA limit of branch 5 - 6 not given, set to 9900
-% ***** MVA limit of branch 6 - 11 not given, set to 9900
-% ***** MVA limit of branch 6 - 12 not given, set to 9900
-% ***** MVA limit of branch 6 - 13 not given, set to 9900
-% ***** MVA limit of branch 7 - 8 not given, set to 9900
-% ***** MVA limit of branch 7 - 9 not given, set to 9900
-% ***** MVA limit of branch 9 - 10 not given, set to 9900
-% ***** MVA limit of branch 9 - 14 not given, set to 9900
-% ***** MVA limit of branch 10 - 11 not given, set to 9900
-% ***** MVA limit of branch 12 - 13 not given, set to 9900
-% ***** MVA limit of branch 13 - 14 not given, set to 9900

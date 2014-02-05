@@ -1,11 +1,19 @@
 function pk(;g=1,b=-10,vk=1,vm=1,pm=-1)
     # solve for pk given pm,vk,vm; ignores theta
+    if g==0
+        return -pm
+    end
     temp = b^2*(-pm^2+(2*g*pm+(b^2+g^2)*vk^2)*vm^2-g^2*vm^4)
     temp < 0 ? NaN : 1/(b^2+g^2) * ((-b^2+g^2)*pm+g^3*(vk^2-vm^2)+b^2*g*(vk^2+vm^2)-2*g*temp^.5)
 end
 
 function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
     # solve for pk, θkm given pm,vk,vm
+    if g==0
+        pk = -pm
+        θ = -asin(pm/(b*vk*vm)) # maybe should check the argument here
+        return pk, θ
+    end
     disc = b^2*(-pm^2+(2*g*pm+(b^2+g^2)*vk^2)*vm^2-g^2*vm^4)
     if disc < 0 
         return NaN, NaN

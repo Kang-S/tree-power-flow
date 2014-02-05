@@ -2,13 +2,14 @@ using CandidateModule
 using BusModule
 include("basics.jl")
 
-function run_algo(buses, N, R1, R2)
+function run_algo(buses, N, R1, R2, vhat=1.0)
 
     # round 'to the p' place... e.g. if p=.2, _round(1.12) = 1.2 and _round(1.08) = 1.0
     # TODO: experiment -- make the key an integer
     _round(x, p) = round(x/p)*p
     key(c) = _round(c.p, R2), c.v
     VRANGE = linspace(.8,1.2,N)
+    sort!(VRANGE, by = x->abs(vhat-x))
 
     function f1(bus)
         round1(pkm,vm,pm) = _round(pkm, R1)
@@ -46,6 +47,9 @@ function run_algo(buses, N, R1, R2)
             return
         end
         for vk in VRANGE
+            if !haskey(bus.raw_flows[1], vk)
+                continue
+            end
             pairs = shuffle(product(bus.raw_flows[1][vk], bus.raw_flows[2][vk]))
             candidates = Dict()
             for (b1, b2) in pairs
@@ -69,10 +73,37 @@ function run_algo(buses, N, R1, R2)
         #bus.raw_flows = [Dict() for child in bus.children]
     end
 
-    for i=length(buses):-1:1
+    # for the non-root buses we collect solutions for all voltages
+    for i=length(buses):-1:2
         print(buses[i], ' ')
         f1(buses[i])
         f2(buses[i])
         println(length(buses[i].candidates))
     end
+
+    # for the root, we look for solutions close to vhat and stop once we find 
+    # a voltage that gives solutions
+    print(buses[1], ' ')
+    function f1root(bus)
+        round1(pkm,vm,pm) = _round(pkm, R1)
+        for vk in VRANGE
+            for (i,child) in enumerate(bus.children)
+                d, g, b = child.d, child.g, child.b
+                p(c::Candidate) = pk(g=g,b=b,vk=vk,vm=c.v,pm=-(c.p+d))
+                raw_flows = filter!(x->!isnan(x[1]), shuffle([(p(c),c.v,c.p+d) for c in values(child.candidates)]))
+                if length(raw_flows) > 0
+                    bus.raw_flows[i][vk] = collect(values([round1(x...)=>x for x in raw_flows]))
+                end
+            end
+            # check if there is at least one raw_flow per child at this voltage
+            exists_flow = [length(bus.raw_flows[i][vk])>0 for i=1:length(bus.children)]
+            if all(exists_flow)
+                return
+            end
+        end
+        @assert false # didn't find a solution at the root
+    end
+    f1root(buses[1])
+    f2(buses[1])
+    println(length(buses[1].candidates))
 end;
