@@ -1,6 +1,6 @@
 tree-power-flow
 ===============
-![](https://raw.github.com/sharnett/tree-power-flow/master/graph14.png)
+![](https://raw.github.com/sharnett/tree-power-flow/master/graph14_tree.png)
 
 Browse the [rendered notebooks](http://nbviewer.ipython.org/github/sharnett/tree-power-flow/tree/master/)
 
