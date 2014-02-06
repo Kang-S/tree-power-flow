@@ -1,7 +1,7 @@
 function pk(;g=1,b=-10,vk=1,vm=1,pm=-1)
     # solve for pk given pm,vk,vm; ignores theta
     if g==0
-        return -pm
+        return abs(pm/(b*vk*vm)) <= 1 ? -pm : NaN
     end
     temp = b^2*(-pm^2+(2*g*pm+(b^2+g^2)*vk^2)*vm^2-g^2*vm^4)
     temp < 0 ? NaN : 1/(b^2+g^2) * ((-b^2+g^2)*pm+g^3*(vk^2-vm^2)+b^2*g*(vk^2+vm^2)-2*g*temp^.5)
@@ -11,7 +11,12 @@ function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
     # solve for pk, θkm given pm,vk,vm
     if g==0
         pk = -pm
-        θ = -asin(pm/(b*vk*vm)) # maybe should check the argument here
+        try
+            θ = -asin(pm/(b*vk*vm)) # maybe should check the argument here
+        catch
+            println(pm/(b*vk*vm))
+            throw(DomainError())
+        end
         return pk, θ
     end
     disc = b^2*(-pm^2+(2*g*pm+(b^2+g^2)*vk^2)*vm^2-g^2*vm^4)
@@ -20,7 +25,7 @@ function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
     end
     pk = 1/(b^2+g^2) * ((-b^2+g^2)*pm+g^3*(vk^2-vm^2)+b^2*g*(vk^2+vm^2)-2*g*disc^.5)
     arg = (-g*pm+g^2*vm^2+disc^.5)/((b^2+g^2)*vk*vm)
-    if arg > 1 arg = 1 end
+    if arg > 1 arg = 1 end # if it's WAY too big, should throw an exception
     if arg < -1 arg = -1 end
     temp = -pm^2+(2*g*pm+g^2*vk^2)*vm^2-g^2*vm^4
     θ = temp > 0 ? acos(arg) : -acos(arg)
