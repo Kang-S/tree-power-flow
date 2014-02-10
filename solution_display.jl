@@ -1,6 +1,7 @@
-function pretty(bus, candidates; start=1, stop=5)
+function pretty(bus, candidates; start=1, stop=5, R2=0)
     name = bus.name
-    @printf "%7s %7s " "p$name" "v$name"
+    @printf "%7s %7s %7s " "key" "p$name" "v$name"
+    #@printf "%7s %7s " "p$name" "v$name"
     for child in bus.children
         cname = child.name
         both = @sprintf "%s_%s" name cname
@@ -8,7 +9,11 @@ function pretty(bus, candidates; start=1, stop=5)
     end
     println()
 
+    _round(x, p) = round(x/p)*p
+    key(c) = _round(c.p, R2), c.v
     for candidate in candidates[start:stop]
+        k = R2 > 0 ? key(candidate) : 0
+        @printf "%7.2f " k[1]
         @printf "%7.2f " candidate.p
         @printf "%7.2f " candidate.v
         for i = 1:candidate.n

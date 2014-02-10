@@ -78,7 +78,13 @@ function run_algo(buses, N, R1, R2, vhat=1.0)
         print(buses[i], ' ')
         f1(buses[i])
         f2(buses[i])
-        println(length(buses[i].candidates))
+        num_raw_flows = 0
+        for child in buses[i].raw_flows
+            for raw_flows in values(child)
+                num_raw_flows += length(raw_flows)
+            end
+        end
+        println(num_raw_flows, ' ', length(buses[i].candidates))
     end
 
     # for the root, we look for solutions close to vhat and stop once we find 
@@ -105,5 +111,11 @@ function run_algo(buses, N, R1, R2, vhat=1.0)
     end
     f1root(buses[1])
     f2(buses[1])
-    println(length(buses[1].candidates))
+    num_raw_flows = 0
+    for child in buses[1].raw_flows
+        for raw_flows in values(child)
+            num_raw_flows += length(raw_flows)
+        end
+    end
+    println(num_raw_flows, ' ', length(buses[1].candidates))
 end;
