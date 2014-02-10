@@ -2,7 +2,7 @@ using CandidateModule
 using BusModule
 include("basics.jl")
 
-function run_algo(buses, N, R1, R2, vhat=1.0)
+function run_algo(buses, N, R1, R2, vhat=1.0, verbose=false)
 
     # round 'to the p' place... e.g. if p=.2, _round(1.12) = 1.2 and _round(1.08) = 1.0
     # TODO: experiment -- make the key an integer
@@ -75,21 +75,27 @@ function run_algo(buses, N, R1, R2, vhat=1.0)
 
     # for the non-root buses we collect solutions for all voltages
     for i=length(buses):-1:2
-        print(buses[i], ' ')
+        if verbose
+            @printf "%6s " buses[i]
+        end
         f1(buses[i])
         f2(buses[i])
-        num_raw_flows = 0
-        for child in buses[i].raw_flows
-            for raw_flows in values(child)
-                num_raw_flows += length(raw_flows)
+        if verbose
+            num_raw_flows = 0
+            for child in buses[i].raw_flows
+                for raw_flows in values(child)
+                    num_raw_flows += length(raw_flows)
+                end
             end
+            @printf "%6d %5d\n" num_raw_flows length(buses[i].candidates)
         end
-        println(num_raw_flows, ' ', length(buses[i].candidates))
     end
 
     # for the root, we look for solutions close to vhat and stop once we find 
     # a voltage that gives solutions
-    print(buses[1], ' ')
+    if verbose
+        @printf "%6s " buses[1]
+    end
     function f1root(bus)
         round1(pkm,vm,pm) = _round(pkm, R1)
         for vk in VRANGE
@@ -111,11 +117,13 @@ function run_algo(buses, N, R1, R2, vhat=1.0)
     end
     f1root(buses[1])
     f2(buses[1])
-    num_raw_flows = 0
-    for child in buses[1].raw_flows
-        for raw_flows in values(child)
-            num_raw_flows += length(raw_flows)
+    if verbose
+        num_raw_flows = 0
+        for child in buses[1].raw_flows
+            for raw_flows in values(child)
+                num_raw_flows += length(raw_flows)
+            end
         end
+        @printf "%6d %5d\n" num_raw_flows length(buses[1].candidates)
     end
-    println(num_raw_flows, ' ', length(buses[1].candidates))
 end;
