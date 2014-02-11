@@ -2,7 +2,7 @@ using CandidateModule
 using BusModule
 include("basics.jl")
 
-function run_algo(buses, N, R1, R2, vhat=1.0, verbose=false)
+function run_algo(root, N, R1, R2, vhat=1.0, verbose=false)
 
     # round 'to the p' place... e.g. if p=.2, _round(1.12) = 1.2 and _round(1.08) = 1.0
     # TODO: experiment -- make the key an integer
@@ -73,28 +73,40 @@ function run_algo(buses, N, R1, R2, vhat=1.0, verbose=false)
         #bus.raw_flows = [Dict() for child in bus.children]
     end
 
-    # for the non-root buses we collect solutions for all voltages
-    for i=length(buses):-1:2
-        if verbose
-            @printf "%6s " buses[i]
+    buses = Bus[]
+    function DFS(bus)
+        for child in bus.children
+            DFS(child)
         end
-        f1(buses[i])
-        f2(buses[i])
+        push!(buses, bus)
+    end
+    DFS(root)
+
+    # for the non-root buses we collect solutions for all voltages
+    for bus in buses
+        if bus == root
+            continue
+        end
+        if verbose
+            @printf "%6s " bus
+        end
+        f1(bus)
+        f2(bus)
         if verbose
             num_raw_flows = 0
-            for child in buses[i].raw_flows
+            for child in bus.raw_flows
                 for raw_flows in values(child)
                     num_raw_flows += length(raw_flows)
                 end
             end
-            @printf "%6d %5d\n" num_raw_flows length(buses[i].candidates)
+            @printf "%6d %5d\n" num_raw_flows length(bus.candidates)
         end
     end
 
     # for the root, we look for solutions close to vhat and stop once we find 
     # a voltage that gives solutions
     if verbose
-        @printf "%6s " buses[1]
+        @printf "%6s " root
     end
     function f1root(bus)
         round1(pkm,vm,pm) = _round(pkm, R1)
@@ -115,15 +127,15 @@ function run_algo(buses, N, R1, R2, vhat=1.0, verbose=false)
         end
         @assert false # didn't find a solution at the root
     end
-    f1root(buses[1])
-    f2(buses[1])
+    f1root(root)
+    f2(root)
     if verbose
         num_raw_flows = 0
-        for child in buses[1].raw_flows
+        for child in root.raw_flows
             for raw_flows in values(child)
                 num_raw_flows += length(raw_flows)
             end
         end
-        @printf "%6d %5d\n" num_raw_flows length(buses[1].candidates)
+        @printf "%6d %5d\n" num_raw_flows length(root.candidates)
     end
 end;
