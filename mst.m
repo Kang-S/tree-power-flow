@@ -1,5 +1,19 @@
-function [mpc, t, t2, DG, UG, branchmap] = mst(mpc),
-    r = runpf(mpc);
+function [mpc_tree, t] = mst(mpc),
+    function simplified_mpc = simplify_case(mpc),
+        simplified_mpc = mpc;
+        simplified_mpc.branch(:,5) = 0; % ignore shunt
+        simplified_mpc.branch(:,11) = 1; % set status to on
+        simplified_mpc.branch(:,3:4) = mpc.branch(:,3:4)/mpc.baseMVA;
+        simplified_mpc.baseMVA = 1;
+    end
+    opt = mpoption('OUT_ALL', 0, 'VERBOSE', 0);
+    mpc_tree = simplify_case(mpc);
+    r = runpf(mpc_tree, opt);
+    if r.success ~= 1,
+        t = [];
+        display('runpf failed');
+        return;
+    end
     r = ext2int(r);
     n = size(r.bus, 1);
     m = size(r.branch, 1);
@@ -23,5 +37,6 @@ function [mpc, t, t2, DG, UG, branchmap] = mst(mpc),
     [i,j] = find(t2);
     t = full(branchmap(sub2ind([n n],i,j)));
     %sort(t)'
-    %t = r.order.branch.i2e(t);
-    mpc.branch = mpc.branch(t, :);
+    %t = r.order.branch.i2e(t); # TODO: crap, do I need to worry about this?
+    mpc_tree.branch = mpc_tree.branch(t, :);
+end
