@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       157,          7]
-NotebookDataLength[    138521,       3973]
-NotebookOptionsPosition[    137804,       3943]
-NotebookOutlinePosition[    138160,       3959]
-CellTagsIndexPosition[    138117,       3956]
+NotebookDataLength[    140315,       4028]
+NotebookOptionsPosition[    139435,       3993]
+NotebookOutlinePosition[    139792,       4009]
+CellTagsIndexPosition[    139749,       4006]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -3939,12 +3939,62 @@ Cell[BoxData[
  CellChangeTimes->{
   3.600353637283423*^9, 3.600353754217555*^9, {3.600353790501978*^9, 
    3.6003538066902*^9}, 3.600353984452344*^9, 3.6003543687855597`*^9}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FullSimplify", "[", 
+  RowBox[{
+   RowBox[{"Solve", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"P2", "\[Equal]", 
+        RowBox[{
+         RowBox[{"-", "B"}], " ", "V2", "  ", "V1", " ", 
+         RowBox[{"Sin", "[", "\[Theta]", "]"}]}]}], ",", 
+       RowBox[{"P1", "\[Equal]", 
+        RowBox[{"B", " ", "V2", "  ", "V1", " ", 
+         RowBox[{"Sin", "[", "\[Theta]", "]"}]}]}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"\[Theta]", ",", "P1"}], "}"}]}], "]"}], ",", 
+   RowBox[{
+    RowBox[{"V1", ">", "0"}], "&&", 
+    RowBox[{"V2", ">", "0"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6005899898424397`*^9, 3.6005900061791162`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox[
+   RowBox[{"Solve", "::", "ifun"}], "MessageName"], 
+  RowBox[{
+  ":", " "}], "\<\"Inverse functions are being used by \
+\[NoBreak]\\!\\(Solve\\)\[NoBreak], so some solutions may not be found; use \
+Reduce for complete solution information. \\!\\(\\*ButtonBox[\\\"\
+\[RightSkeleton]\\\", ButtonStyle->\\\"Link\\\", ButtonFrame->None, \
+ButtonData:>\\\"paclet:ref/message/Solve/ifun\\\", ButtonNote -> \
+\\\"Solve::ifun\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.6005900070456123`*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"\[Theta]", "\[Rule]", 
+     RowBox[{"-", 
+      RowBox[{"ArcCsc", "[", 
+       FractionBox[
+        RowBox[{"B", " ", "V1", " ", "V2"}], "P2"], "]"}]}]}], ",", 
+    RowBox[{"P1", "\[Rule]", 
+     RowBox[{"-", "P2"}]}]}], "}"}], "}"}]], "Output",
+ CellChangeTimes->{3.6005900072447557`*^9}]
 }, Open  ]]
 },
 WindowSize->{740, 867},
 WindowMargins->{{278, Automatic}, {Automatic, 22}},
-FrontEndVersion->"8.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (October 5, \
-2011)",
+FrontEndVersion->"8.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (November 6, \
+2010)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -3974,10 +4024,14 @@ Cell[18700, 555, 1091, 26, 53, "Input"],
 Cell[CellGroupData[{
 Cell[19816, 585, 222, 4, 27, "Input"],
 Cell[20041, 591, 117747, 3349, 13178, "Output"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[137825, 3945, 696, 19, 37, "Input"],
+Cell[138524, 3966, 533, 11, 41, "Message"],
+Cell[139060, 3979, 359, 11, 46, "Output"]
 }, Open  ]]
 }
 ]
 *)
 
 (* End of internal cache information *)
-

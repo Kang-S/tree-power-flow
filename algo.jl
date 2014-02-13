@@ -115,9 +115,7 @@ function run_algo(root, N, R1, R2, vhat=1.0, verbose=false)
                 d, g, b = child.d, child.g, child.b
                 p(c::Candidate) = pk(g=g,b=b,vk=vk,vm=c.v,pm=-(c.p+d))
                 raw_flows = filter!(x->!isnan(x[1]), shuffle([(p(c),c.v,c.p+d) for c in values(child.candidates)]))
-                if length(raw_flows) > 0
-                    bus.raw_flows[i][vk] = collect(values([round1(x...)=>x for x in raw_flows]))
-                end
+                bus.raw_flows[i][vk] = collect(values([round1(x...)=>x for x in raw_flows]))
             end
             # check if there is at least one raw_flow per child at this voltage
             exists_flow = [length(bus.raw_flows[i][vk])>0 for i=1:length(bus.children)]

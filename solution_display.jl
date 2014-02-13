@@ -46,7 +46,7 @@ function print_full_solution(candidate, root, R2)
     # from the candidate of the parent
     _round(x, p) = round(x/p)*p
     key(p::Float64, v::Float64) = _round(p, R2), v
-    @printf "%6s %7.3f %7.3f\n" root candidate.p candidate.v
+    @printf "%6s %8s %5.2f %8.2f\n" root '-' candidate.v candidate.p 
     q = [(candidate,root)];
     while length(q) > 0
         c,b = pop!(q)
@@ -56,7 +56,7 @@ function print_full_solution(candidate, root, R2)
             p1,v,p2 = c.children[:,i]
             candidate = child.candidates[key(p2-d,v)]
             unshift!(q, (candidate, child))
-            @printf "%6s %7.3f %7.3f %7.3f\n" child p1 v p2
+            @printf "%6s %8.2f %5.2f %8.2f\n" child p1 v p2
         end
     end
 end
