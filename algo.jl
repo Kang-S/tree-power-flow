@@ -2,13 +2,13 @@ using CandidateModule
 using BusModule
 include("basics.jl")
 
-function run_algo(root, N, R1, R2, vhat=1.0, verbose=false)
+function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
 
     # round 'to the p' place... e.g. if p=.2, _round(1.12) = 1.2 and _round(1.08) = 1.0
     # TODO: experiment -- make the key an integer
     _round(x, p) = round(x/p)*p
     key(c) = _round(c.p, R2), c.v
-    VRANGE = linspace(.8,1.2,N)
+    VRANGE = linspace(vmin,vmax,N)
     sort!(VRANGE, by = x->abs(vhat-x))
 
     function f1(bus)
@@ -47,7 +47,7 @@ function run_algo(root, N, R1, R2, vhat=1.0, verbose=false)
             return
         end
         for vk in VRANGE
-            if !haskey(bus.raw_flows[1], vk)
+            if !haskey(bus.raw_flows[1], vk) || !haskey(bus.raw_flows[2], vk)
                 continue
             end
             pairs = shuffle(product(bus.raw_flows[1][vk], bus.raw_flows[2][vk]))
