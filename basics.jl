@@ -13,6 +13,7 @@ function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
         pk = -pm
         try
             θ = -asin(pm/(b*vk*vm)) # maybe should check the argument here
+            if check(g=g,b=b,vk=vk,vm=vm,pk=pk,pm=pm,θ=θ) > 1e-6 θ=-θ end
         catch
             println(pm/(b*vk*vm))
             throw(DomainError())
@@ -25,10 +26,11 @@ function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
     end
     pk = 1/(b^2+g^2) * ((-b^2+g^2)*pm+g^3*(vk^2-vm^2)+b^2*g*(vk^2+vm^2)-2*g*disc^.5)
     arg = (-g*pm+g^2*vm^2+disc^.5)/((b^2+g^2)*vk*vm)
-    if arg > 1 arg = 1 end # if it's WAY too big, should throw an exception
+    if abs(arg)-1 > 1e-6 throw(DomainError()) end
+    if arg > 1 arg = 1 end
     if arg < -1 arg = -1 end
-    temp = -pm^2+(2*g*pm+g^2*vk^2)*vm^2-g^2*vm^4
-    θ = temp > 0 ? acos(arg) : -acos(arg)
+    θ = acos(arg)
+    if check(g=g,b=b,vk=vk,vm=vm,pk=pk,pm=pm,θ=θ) > 1e-2 θ=-θ end
     pk, θ
 end
 
@@ -68,6 +70,16 @@ function check_bus(bus)
     maximum(map(cc, values(bus.candidates)))
 end
 
-function check_all(bus_list)
-    maximum(map(check_bus, bus_list))
+function check_all(root::Bus)
+    error_list = Float64[]
+    function DFS(bus)
+        for child in bus.children
+            DFS(child)
+        end
+        err = check_bus(bus)
+        if err > 1e-5 println(bus) end
+        push!(error_list, err)
+    end
+    DFS(root)
+    maximum(error_list)
 end

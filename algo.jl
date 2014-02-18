@@ -47,9 +47,15 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
             return
         end
         for vk in VRANGE
-            if !haskey(bus.raw_flows[1], vk) || !haskey(bus.raw_flows[2], vk)
-                continue
+            # TODO: this shouldn't exists; sort out the creation of the raw flows
+            missing = false
+            for raw_flow in bus.raw_flows
+                if !haskey(raw_flow, vk) 
+                    missing = true
+                    break
+                end
             end
+            if missing continue end
             pairs = shuffle(product(bus.raw_flows[1][vk], bus.raw_flows[2][vk]))
             candidates = Dict()
             for (b1, b2) in pairs
