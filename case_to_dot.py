@@ -12,14 +12,6 @@ if (len(sys.argv) == 2):
     #print >>outf, "\tnode [shape=point, height=.2, width=.2, fontsize=12];"
     line = ""
 
-    while line.find("mpc.bus = [") == -1:
-        line = f.readline()
-        if line == "": break
-    while line.find("];") == -1:
-        line = f.readline()
-        m = re.search(r'(\d+)\s+\d+\s+-', line)
-        if m: print >>outf, ("\t" + m.group(1) + " [style=bold, color=blue];")
-
     while line.find("mpc.gen = [") == -1:
         line = f.readline()
         if line == "": break
