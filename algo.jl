@@ -22,7 +22,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                     bus.raw_flows[i][vk] = collect(values([round1(x...)=>x for x in raw_flows]))
                 end
             end
-            @assert length(bus.raw_flows[i]) > 0
+            if length(bus.raw_flows[i]) == 0 error("no solution at $bus") end
         end
     end
 
@@ -129,7 +129,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 return
             end
         end
-        @assert false # didn't find a solution at the root
+        error("no solution at root ($root)")
     end
     f1root(root)
     f2(root)

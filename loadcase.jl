@@ -6,12 +6,25 @@ function parse_matpower(casefile)
     while ~ismatch(r"mpc.bus = \[", lines[i]) i += 1 end
     i += 1
     demands = Dict()
-    root = 1
+    root, vhat = 1, 1.0
     while ~ismatch(r"\];", lines[i])
         bus, bus_type, d = split(lines[i])
         bus, bus_type, d = parseint(bus), parseint(bus_type), parsefloat(d)
         if bus_type == 3 root = bus end
         demands[bus] = d
+        i += 1
+    end
+    i += 1
+    while ~ismatch(r"mpc.gen = \[", lines[i]) i += 1 end
+    i += 1
+    while ~ismatch(r"\];", lines[i])
+        bus, p, _, _, _, v = split(lines[i])
+        bus, p, v = parseint(bus), parsefloat(p), parsefloat(v)
+        if bus == root
+            vhat = v
+        else
+            demands[bus] -= p
+        end
         i += 1
     end
     i += 1
@@ -28,7 +41,7 @@ function parse_matpower(casefile)
         admittances[tbus][fbus] = (g,b)
         i += 1
     end
-    demands, admittances, root
+    demands, admittances, root, vhat
 end
 
 function assemble_buses(demands, admittances, root)
@@ -58,6 +71,7 @@ function assemble_buses(demands, admittances, root)
 end
 
 function loadcase(casefile)
-    d,a,r = parse_matpower(casefile)
-    assemble_buses(d,a,r)
+    d,a,r,vhat = parse_matpower(casefile)
+    root = assemble_buses(d,a,r)
+    root, vhat
 end;

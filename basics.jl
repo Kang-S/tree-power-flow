@@ -38,8 +38,8 @@ function check(;g=1,b=-10,vk=1,vm=1,pk=.995,pm=-1,θ=-.1)
     # sanity check after a solution has been found
     pk_hat = g*(vk^2-vk*vm*cos(θ)) + b*vk*vm*sin(θ)
     pm_hat = g*(vm^2-vk*vm*cos(θ)) - b*vk*vm*sin(θ)
-    err1 = pk_hat > 1e-6 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
-    err2 = pm_hat > 1e-6 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
+    err1 = pk_hat > 1e-4 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
+    err2 = pm_hat > 1e-4 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
     maximum([err1, err2])
 end
 
@@ -47,8 +47,8 @@ function check2(;g=1,b=-10,vk=1,vm=1,pk=.995,pm=-1,θ=-.1)
     # sanity check after a solution has been found
     pk_hat = g*(vk^2-vk*vm*cos(θ)) + b*vk*vm*sin(θ)
     pm_hat = g*(vm^2-vk*vm*cos(θ)) - b*vk*vm*sin(θ)
-    err1 = abs(pk_hat) > 1e-6 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
-    err2 = abs(pm_hat) > 1e-6 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
+    err1 = abs(pk_hat) > 1e-4 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
+    err2 = abs(pm_hat) > 1e-4 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
     err1, err2, pk_hat, pm_hat
 end
 
@@ -77,7 +77,7 @@ function check_all(root::Bus)
             DFS(child)
         end
         err = check_bus(bus)
-        if err > 1e-5 println(bus) end
+        if err > 1e-4 println(bus) end
         push!(error_list, err)
     end
     DFS(root)
