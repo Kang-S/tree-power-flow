@@ -60,3 +60,31 @@ function print_full_solution(candidate, root, R2)
         end
     end
 end
+
+function matpower_compare(candidate, root, R2)
+    # different format for print_full_solution
+    _round(x, p) = round(x/p)*p
+    key(p::Float64, v::Float64) = _round(p, R2), v
+    q = [(candidate,root)];
+    # fbus, tbus, fp, tp
+    list = [(0, 1, NaN, NaN)]
+    while length(q) > 0
+        c,b = pop!(q)
+        for i=1:c.n
+            child = b.children[i]
+            d = child.d
+            p1,v,p2 = c.children[:,i]
+            candidate = child.candidates[key(p2-d,v)]
+            unshift!(q, (candidate, child))
+            if parseint(b.name) < parseint(child.name)
+                push!(list, (parseint(b.name), parseint(child.name), p1, -p2))
+            else
+                push!(list, (parseint(child.name), parseint(b.name), -p2, p1))
+            end
+        end
+    end
+    sort!(list)
+    for branch in list[2:end]
+        @printf "%16d %16d %16.2f %16.2f\n" branch[1] branch[2] branch[3] branch[4]
+    end
+end
