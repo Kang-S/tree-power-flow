@@ -61,13 +61,36 @@ function print_full_solution(candidate, root, R2)
     end
 end
 
-function matpower_compare(candidate, root, R2)
+function load_matpower_solution(casefile)
+    lines = open(readlines, casefile)
+    if lines[1] != "converged\n" error("casefile doesn't look like it converged") end
+    i = 1
+    while ~ismatch(r"mpc.branch = \[", lines[i]) i += 1 end
+    i += 1
+    # from_bus, to_bus, from_power, to_power
+    list = (Int64,Int64,Float64,Float64)[]
+    while ~ismatch(r"\];", lines[i])
+        line = split(lines[i])
+        fbus, tbus, fpower, tpower = line[1], line[2], line[14], line[16]
+        fbus, tbus, fpower, tpower = parseint(fbus), parseint(tbus), parsefloat(fpower), parsefloat(tpower)
+        # we'll use the convention that from_bus is always less than to_bus
+        if fbus < tbus
+            push!(list, (fbus,tbus,fpower,tpower))
+        else
+            push!(list, (tbus,fbus,tpower,fpower))
+        end
+        i += 1
+    end
+    sort(list)
+end
+
+function matpower_compare(casefile, candidate, root, R2)
     # different format for print_full_solution
     _round(x, p) = round(x/p)*p
     key(p::Float64, v::Float64) = _round(p, R2), v
     q = [(candidate,root)];
-    # fbus, tbus, fp, tp
-    list = [(0, 1, NaN, NaN)]
+    # from_bus, to_bus, from_power, to_power
+    list = (Int64,Int64,Float64,Float64)[]
     while length(q) > 0
         c,b = pop!(q)
         for i=1:c.n
@@ -76,6 +99,7 @@ function matpower_compare(candidate, root, R2)
             p1,v,p2 = c.children[:,i]
             candidate = child.candidates[key(p2-d,v)]
             unshift!(q, (candidate, child))
+            # we'll use the convention that from_bus is always less than to_bus
             if parseint(b.name) < parseint(child.name)
                 push!(list, (parseint(b.name), parseint(child.name), p1, -p2))
             else
@@ -83,8 +107,10 @@ function matpower_compare(candidate, root, R2)
             end
         end
     end
-    sort!(list)
-    for branch in list[2:end]
-        @printf "%16d %16d %16.2f %16.2f\n" branch[1] branch[2] branch[3] branch[4]
+    matpower_list = load_matpower_solution(casefile)
+    for (me, matpower) in zip(sort(list), matpower_list)
+        assert(me[1] == matpower[1])
+        assert(me[2] == matpower[2])
+        @printf "%16d %16d %16.2f %16.2f %16.2f %16.2f\n" me[1] me[2] me[3] matpower[3] me[4] matpower[4]
     end
 end
