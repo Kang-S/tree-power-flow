@@ -14,7 +14,6 @@ function parse_matpower(casefile)
         demands[bus] = d
         i += 1
     end
-    i += 1
     while ~ismatch(r"mpc.gen = \[", lines[i]) i += 1 end
     i += 1
     while ~ismatch(r"\];", lines[i])
@@ -27,7 +26,6 @@ function parse_matpower(casefile)
         end
         i += 1
     end
-    i += 1
     while ~ismatch(r"mpc.branch = \[", lines[i]) i += 1 end
     i += 1
     admittances = [i=>Dict() for i in keys(demands)]

@@ -65,19 +65,30 @@ function load_matpower_solution(casefile)
     lines = open(readlines, casefile)
     if lines[1] != "converged\n" error("casefile doesn't look like it converged") end
     i = 1
+    while ~ismatch(r"mpc.bus = \[", lines[i]) i += 1 end
+    i += 1
+    voltages = Dict()
+    while ~ismatch(r"\];", lines[i])
+        line = split(lines[i])
+        bus, v = line[1], line[8]
+        bus, v = parseint(bus), parsefloat(v)
+        voltages[bus] = v
+        i += 1
+    end
     while ~ismatch(r"mpc.branch = \[", lines[i]) i += 1 end
     i += 1
-    # from_bus, to_bus, from_power, to_power
-    list = (Int64,Int64,Float64,Float64)[]
+    # from_bus, to_bus, from_power, to_power, from_voltage, to_voltage
+    list = (Int64,Int64,Float64,Float64,Float64,Float64)[]
     while ~ismatch(r"\];", lines[i])
         line = split(lines[i])
         fbus, tbus, fpower, tpower = line[1], line[2], line[14], line[16]
         fbus, tbus, fpower, tpower = parseint(fbus), parseint(tbus), parsefloat(fpower), parsefloat(tpower)
+        fv, tv = voltages[fbus], voltages[tbus]
         # we'll use the convention that from_bus is always less than to_bus
         if fbus < tbus
-            push!(list, (fbus,tbus,fpower,tpower))
+            push!(list, (fbus,tbus,fpower,tpower,fv,tv))
         else
-            push!(list, (tbus,fbus,tpower,fpower))
+            push!(list, (tbus,fbus,tpower,fpower,tv,fv))
         end
         i += 1
     end
@@ -90,7 +101,7 @@ function matpower_compare(casefile, candidate, root, R2)
     key(p::Float64, v::Float64) = _round(p, R2), v
     q = [(candidate,root)];
     # from_bus, to_bus, from_power, to_power
-    list = (Int64,Int64,Float64,Float64)[]
+    list = (Int64,Int64,Float64,Float64,Float64,Float64)[]
     while length(q) > 0
         c,b = pop!(q)
         for i=1:c.n
@@ -101,16 +112,17 @@ function matpower_compare(casefile, candidate, root, R2)
             unshift!(q, (candidate, child))
             # we'll use the convention that from_bus is always less than to_bus
             if parseint(b.name) < parseint(child.name)
-                push!(list, (parseint(b.name), parseint(child.name), p1, -p2))
+                push!(list, (parseint(b.name), parseint(child.name), p1, -p2, c.v, v))
             else
-                push!(list, (parseint(child.name), parseint(b.name), -p2, p1))
+                push!(list, (parseint(child.name), parseint(b.name), -p2, p1, v, c.v))
             end
         end
     end
     matpower_list = load_matpower_solution(casefile)
+    @printf "%6s %6s %10s %10s %10s %10s %6s %6s %6s %6s\n" "fbus" "tbus" "fp1" "fp2" "tp1" "tp2" "fv1" "fv2" "tv1" "tv2" 
     for (me, matpower) in zip(sort(list), matpower_list)
         assert(me[1] == matpower[1])
         assert(me[2] == matpower[2])
-        @printf "%16d %16d %16.2f %16.2f %16.2f %16.2f\n" me[1] me[2] me[3] matpower[3] me[4] matpower[4]
+        @printf "%6d %6d %10.1f %10.1f %10.1f %10.1f %6.2f %6.2f %6.2f %6.2f\n" me[1] me[2] me[3] matpower[3] me[4] matpower[4] me[5] matpower[5] me[6] matpower[6]
     end
 end
