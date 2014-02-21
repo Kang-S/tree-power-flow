@@ -1,8 +1,13 @@
+import Logging: Logging, DEBUG, debug, info, err
+Logging.configure(level=DEBUG, filename="log.txt")
 using CandidateModule
 using BusModule
 include("basics.jl")
 
 function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
+
+    tic()
+    info("STARTING ALGO with root=$root, N=$N, R1=$R1, R2=$R2, vhat=$vhat, verbose=$verbose, vmin=$vmin, vmax=$vmax")
 
     # round 'to the p' place... e.g. if p=.2, _round(1.12) = 1.2 and _round(1.08) = 1.0
     # TODO: experiment -- make the key an integer
@@ -88,32 +93,30 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
     end
     DFS(root)
 
+    # TODO: the root/non-root bus split could be changed to generator/non-generator
+
     # for the non-root buses we collect solutions for all voltages
     for bus in buses
+        bus_time_start = toq()
         if bus == root
             continue
         end
-        if verbose
-            @printf "%6s " bus
-        end
         f1(bus)
         f2(bus)
-        if verbose
-            num_raw_flows = 0
-            for child in bus.raw_flows
-                for raw_flows in values(child)
-                    num_raw_flows += length(raw_flows)
-                end
+        num_raw_flows = 0
+        for child in bus.raw_flows
+            for raw_flows in values(child)
+                num_raw_flows += length(raw_flows)
             end
-            @printf "%6d %5d\n" num_raw_flows length(bus.candidates)
         end
+        bus_time_stop = toq()
+        output = @sprintf "%6s %6d %5d %.2f" bus num_raw_flows length(bus.candidates) bus_time_stop-bus_time_start
+        info(output)
+        if verbose print(output, '\n') end
     end
 
     # for the root, we look for solutions close to vhat and stop once we find 
     # a voltage that gives solutions
-    if verbose
-        @printf "%6s " root
-    end
     function f1root(bus)
         round1(pkm,vm,pm) = _round(pkm, R1)
         for vk in VRANGE
@@ -133,13 +136,16 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
     end
     f1root(root)
     f2(root)
-    if verbose
-        num_raw_flows = 0
-        for child in root.raw_flows
-            for raw_flows in values(child)
-                num_raw_flows += length(raw_flows)
-            end
+    num_raw_flows = 0
+    for child in root.raw_flows
+        for raw_flows in values(child)
+            num_raw_flows += length(raw_flows)
         end
-        @printf "%6d %5d\n" num_raw_flows length(root.candidates)
     end
+    output = @sprintf "%6s %6d %5d" root num_raw_flows length(root.candidates)
+    info(output)
+    if verbose println(output) end
+    output = "Algo finished in $(toq()) seconds"
+    info(output)
+    if verbose println(output) end
 end;
