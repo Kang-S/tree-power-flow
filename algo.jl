@@ -16,7 +16,7 @@ end
 
 function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
 
-	total_time = 0
+    total_time = 0
     tic()
     info("ALGO STARTING with root=$root, N=$N, R1=$R1, R2=$R2, vhat=$vhat, verbose=$verbose, vmin=$vmin, vmax=$vmax")
 
@@ -28,13 +28,13 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
     sort!(VRANGE, by = x->abs(vhat-x))
 
     function compute_raw_flows(bus, i, vk)
-    	child = bus.children[i]
+        child = bus.children[i]
         d, g, b = child.d, child.g, child.b
         function rf(c::Candidate) 
-        	pkm = pk(g=g,b=b,vk=vk,vm=c.v,pm=-(c.p+d))
-        	vm = c.v
-        	pm = c.p+d
-        	pkm, vm, pm
+            pkm = pk(g=g,b=b,vk=vk,vm=c.v,pm=-(c.p+d))
+            vm = c.v
+            pm = c.p+d
+            pkm, vm, pm
         end
         raw_flows = map(rf, values(child.candidates))
         filter!(x->!isnan(x[1]), raw_flows)
@@ -136,7 +136,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
         f1(bus)
         f2(bus)
         t0 = toq()
-	    total_time += t0
+        total_time += t0
         output = @sprintf "%6s %6d %5d %6.2f" bus num_raw_flows(bus) length(bus.candidates) t0
         info(output)
         if verbose print(output, '\n') end
