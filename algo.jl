@@ -6,6 +6,7 @@ include("basics.jl")
 
 function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
 
+	total_time = 0
     tic()
     info("STARTING ALGO with root=$root, N=$N, R1=$R1, R2=$R2, vhat=$vhat, verbose=$verbose, vmin=$vmin, vmax=$vmax")
 
@@ -96,8 +97,10 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
     # TODO: the root/non-root bus split could be changed to generator/non-generator
 
     # for the non-root buses we collect solutions for all voltages
+    t0 = toq()
+    total_time += t0
     for bus in buses
-        bus_time_start = toq()
+        tic()
         if bus == root
             continue
         end
@@ -109,12 +112,14 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 num_raw_flows += length(raw_flows)
             end
         end
-        bus_time_stop = toq()
-        output = @sprintf "%6s %6d %5d %.2f" bus num_raw_flows length(bus.candidates) bus_time_stop-bus_time_start
+        t0 = toq()
+	    total_time += t0
+        output = @sprintf "%6s %6d %5d %6.2f" bus num_raw_flows length(bus.candidates) t0
         info(output)
         if verbose print(output, '\n') end
     end
 
+    tic()
     # for the root, we look for solutions close to vhat and stop once we find 
     # a voltage that gives solutions
     function f1root(bus)
@@ -142,10 +147,12 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
             num_raw_flows += length(raw_flows)
         end
     end
-    output = @sprintf "%6s %6d %5d" root num_raw_flows length(root.candidates)
+    t0 = toq()
+    total_time += t0
+    output = @sprintf "%6s %6d %5d %6.2f" root num_raw_flows length(root.candidates) t0
     info(output)
     if verbose println(output) end
-    output = "Algo finished in $(toq()) seconds"
+    output = @sprintf "Algo finished in %.2f seconds" total_time
     info(output)
     if verbose println(output) end
 end;
