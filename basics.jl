@@ -77,7 +77,7 @@ function check_all(root::Bus)
             DFS(child)
         end
         err = check_bus(bus)
-        if err > 1e-4 println(bus) end
+        if err > 1e-4 println(bus, ' ', err) end
         push!(error_list, err)
     end
     DFS(root)

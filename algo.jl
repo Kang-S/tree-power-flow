@@ -16,13 +16,19 @@ end
 
 function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
 
+    n = 0 # number of times pk is called
+    m = 0 # number of times key is called
     total_time = 0
     tic()
     info("ALGO STARTING with root=$root, N=$N, R1=$R1, R2=$R2, vhat=$vhat, verbose=$verbose, vmin=$vmin, vmax=$vmax")
 
     # round 'to the p place'... e.g. for p=.2 _round(1.08) = 1.0 and _round(1.12) = 1.2 
     _round(x, p) = round(x/p)*p
-    key(c) = _round(c.p, R2), c.v
+    #key(c) = _round(c.p, R2), c.v
+    function key(c) 
+        m += 1
+        _round(c.p, R2), c.v
+    end
     product(x,y) = collect([(a,b) for a in x, b in y])
     VRANGE = linspace(vmin,vmax,N)
     sort!(VRANGE, by = x->abs(vhat-x))
@@ -31,6 +37,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
         child = bus.children[i]
         d, g, b = child.d, child.g, child.b
         function rf(c::Candidate) 
+            n += 1
             pkm = pk(g=g,b=b,vk=vk,vm=c.v,pm=-(c.p+d))
             vm = c.v
             pm = c.p+d
@@ -70,7 +77,19 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
         end
         error("no solution at root ($root)")
     end
-    
+
+    # return true if a child doesn't have a raw flow for voltage vk
+    function missing(bus, vk)
+        to_return = false
+        for raw_flow in bus.raw_flows
+            if !haskey(raw_flow, vk) 
+                to_return = true
+                break
+            end
+        end
+        to_return
+    end
+
     function f2(bus)
         if length(bus.children) == 0
             for vm in VRANGE
@@ -90,14 +109,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
             return
         end
         for vk in VRANGE
-            missing = false
-            for raw_flow in bus.raw_flows
-                if !haskey(raw_flow, vk) 
-                    missing = true
-                    break
-                end
-            end
-            if missing continue end
+            if missing(bus, vk) continue end
             pairs = shuffle(product(bus.raw_flows[1][vk], bus.raw_flows[2][vk]))
             candidates = Dict()
             for (b1, b2) in pairs
@@ -130,26 +142,28 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
 
     t0 = toq()
     total_time += t0
-    for bus in buses[1:end-1]
-        assert(bus != root)
+
+    function process_bus(bus)
         tic()
-        f1(bus)
+        n1, m1 = n, m
+        if bus == root
+            f1root(bus)
+        else
+            f1(bus)
+        end
         f2(bus)
+        n1, m1 = n-n1, m-m1
         t0 = toq()
         total_time += t0
-        output = @sprintf "%6s %6d %5d %6.2f" bus num_raw_flows(bus) length(bus.candidates) t0
+        output = @sprintf "%6s %6d %6d %6d %5d %f" bus n1 m1 num_raw_flows(bus) length(bus.candidates) t0
         info(output)
         if verbose print(output, '\n') end
     end
 
-    tic()
-    f1root(root)
-    f2(root)
-    t0 = toq()
-    total_time += t0
-    output = @sprintf "%6s %6d %5d %6.2f" root num_raw_flows(root) length(root.candidates) t0
-    info(output)
-    if verbose println(output) end
+    for bus in buses
+        process_bus(bus)
+    end
+
     output = @sprintf "ALGO FINISHED in %.2f seconds" total_time
     info(output)
     if verbose println(output) end
