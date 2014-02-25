@@ -1,4 +1,3 @@
-converged
 function mpc = case14_tree
 
 %% MATPOWER Case Format : Version 2
