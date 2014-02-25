@@ -1,4 +1,6 @@
 using BusModule
+import Logging: Logging, DEBUG, debug, info, err
+Logging.configure(level=DEBUG, filename="log.txt")
 
 function parse_matpower(casefile)
     lines = open(readlines, casefile)
@@ -22,6 +24,8 @@ function parse_matpower(casefile)
         if bus == root
             vhat = v
         else
+            msg = @sprintf "changing demand at bus %d from %f to %f" bus demands[bus] demands[bus]-p
+            info(msg)
             demands[bus] -= p
         end
         i += 1

@@ -78,17 +78,18 @@ function load_matpower_solution(casefile)
     while ~ismatch(r"mpc.branch = \[", lines[i]) i += 1 end
     i += 1
     # from_bus, to_bus, from_power, to_power, from_voltage, to_voltage
-    list = (Int64,Int64,Float64,Float64,Float64,Float64)[]
+    list = (Int64,Int64,Float64,Float64,Float64,Float64,Float64,Float64)[]
     while ~ismatch(r"\];", lines[i])
         line = split(lines[i])
-        fbus, tbus, fpower, tpower = line[1], line[2], line[14], line[16]
-        fbus, tbus, fpower, tpower = parseint(fbus), parseint(tbus), parsefloat(fpower), parsefloat(tpower)
+        fbus, tbus, r, x, fpower, tpower = line[1], line[2], line[3], line[4], line[14], line[16]
+        fbus, tbus, r, x, fpower, tpower = parseint(fbus), parseint(tbus), parsefloat(r), parsefloat(x), parsefloat(fpower), parsefloat(tpower)
+        g, b = r/(r^2+x^2), -x/(r^2+x^2)
         fv, tv = voltages[fbus], voltages[tbus]
         # we'll use the convention that from_bus is always less than to_bus
         if fbus < tbus
-            push!(list, (fbus,tbus,fpower,tpower,fv,tv))
+            push!(list, (fbus,tbus,fpower,tpower,fv,tv,g,b))
         else
-            push!(list, (tbus,fbus,tpower,fpower,tv,fv))
+            push!(list, (tbus,fbus,tpower,fpower,tv,fv,g,b))
         end
         i += 1
     end

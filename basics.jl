@@ -30,7 +30,9 @@ function pk_θ(;g=1,b=-10,vk=1,vm=1,pm=-1)
     if arg > 1 arg = 1 end
     if arg < -1 arg = -1 end
     θ = acos(arg)
-    if check(g=g,b=b,vk=vk,vm=vm,pk=pk,pm=pm,θ=θ) > 1e-2 θ=-θ end
+    err1 = check(g=g,b=b,vk=vk,vm=vm,pk=pk,pm=pm,θ=θ)
+    err2 = check(g=g,b=b,vk=vk,vm=vm,pk=pk,pm=pm,θ=-θ)
+    if err1 > err2 θ=-θ end
     pk, θ
 end
 
@@ -38,8 +40,8 @@ function check(;g=1,b=-10,vk=1,vm=1,pk=.995,pm=-1,θ=-.1)
     # sanity check after a solution has been found
     pk_hat = g*(vk^2-vk*vm*cos(θ)) + b*vk*vm*sin(θ)
     pm_hat = g*(vm^2-vk*vm*cos(θ)) - b*vk*vm*sin(θ)
-    err1 = pk_hat > 1e-4 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
-    err2 = pm_hat > 1e-4 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
+    err1 = abs(pk_hat) > 1e-4 ? abs((pk_hat-pk)/pk_hat) : abs(pk_hat-pk)
+    err2 = abs(pm_hat) > 1e-4 ? abs((pm_hat-pm)/pm_hat) : abs(pm_hat-pm)
     maximum([err1, err2])
 end
 
