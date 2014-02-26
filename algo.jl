@@ -94,7 +94,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
         if length(bus.children) == 0
             for vm in VRANGE
                 c = Candidate(vm, 0)
-                bus.candidates[key(c)] = c
+                if c.p < bus.pmax bus.candidates[key(c)] = c end
             end
             return
         end
@@ -103,7 +103,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 for raw_flow in raw_flows
                     c = Candidate(vk, 1)
                     add!(c, 1, collect(raw_flow))
-                    bus.candidates[key(c)] = c
+                    if c.p < bus.pmax bus.candidates[key(c)] = c end
                 end
             end
             return
@@ -116,7 +116,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 c = Candidate(vk, length(bus.children))
                 add!(c, 1, collect(b1))
                 add!(c, 2, collect(b2))
-                candidates[key(c)] = c
+                if c.p < bus.pmax candidates[key(c)] = c end
             end
             the_rest = [x[vk] for x in bus.raw_flows[3:]]
             for (i,raw_flows) in enumerate(the_rest)
@@ -125,7 +125,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 for (candidate, next_bus) in pairs
                     #n += 1
                     new = add(candidate, i+2, collect(next_bus))
-                    candidates[key(new)] = new
+                    if new.p < bus.pmax candidates[key(new)] = new end
                 end
             end
             merge!(bus.candidates, candidates)
@@ -164,7 +164,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
         process_bus(bus)
     end
 
-    output = @sprintf "ALGO FINISHED in %.2f seconds" total_time
+    output = @sprintf "ALGO FINISHED in %.2f seconds %d %d" total_time m n
     info(output)
     if verbose println(output) end
 end;
