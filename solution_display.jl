@@ -54,8 +54,8 @@ function print_full_solution(candidate, root, R2)
             child = b.children[i]
             d = child.d
             p1,v,p2 = c.children[:,i]
-            candidate = child.candidates[key(p2-d,v)]
-            unshift!(q, (candidate, child))
+            cand = child.candidates[key(p2-d,v)]
+            unshift!(q, (cand, child))
             @printf "%6s %8.2f %5.2f %8.2f\n" child p1 v p2
         end
     end

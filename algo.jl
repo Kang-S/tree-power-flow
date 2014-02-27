@@ -116,7 +116,7 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 c = Candidate(vk, length(bus.children))
                 add!(c, 1, collect(b1))
                 add!(c, 2, collect(b2))
-                if c.p < bus.pmax candidates[key(c)] = c end
+                candidates[key(c)] = c 
             end
             the_rest = [x[vk] for x in bus.raw_flows[3:]]
             for (i,raw_flows) in enumerate(the_rest)
@@ -125,10 +125,13 @@ function run_algo(root, N, R1, R2; vhat=1.0, verbose=false, vmin=.8, vmax=1.2)
                 for (candidate, next_bus) in pairs
                     #n += 1
                     new = add(candidate, i+2, collect(next_bus))
-                    if new.p < bus.pmax candidates[key(new)] = new end
+                    candidates[key(new)] = new 
                 end
             end
-            merge!(bus.candidates, candidates)
+            for c in values(candidates)
+                if c.p < bus.pmax bus.candidates[key(c)] = c end
+            end
+            #merge!(bus.candidates, candidates)
         end
         #bus.raw_flows = [Dict() for child in bus.children]
     end
