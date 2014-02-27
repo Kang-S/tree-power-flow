@@ -1,3 +1,7 @@
+.ipynb_checkpoints/
+venv/
+log.txt
+matlab.log
 junk/*
 cases/*neato*
 *.py[cod]
